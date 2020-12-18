@@ -1,0 +1,46 @@
+version: '3'
+services:
+  http1:
+    image: "winnovature/unitia:production" 
+    ports:
+      - "8001:8080"
+    volumes:
+      - /etc/hosts:/etc/hosts
+      - /home/unitia/:/unitia
+      - /logs:/logs 
+    depends_on:
+      - "router1"
+    environment:
+      - module=http
+      - TZ=Asia/Kolkata  
+  smpp:
+    image: "winnovature/unitia:production"
+    ports:
+      - "2775:8080"
+    volumes:
+      - /etc/hosts:/etc/hosts
+      - /home/unitia/:/unitia
+      - /logs:/logs
+    depends_on:
+      - "router1"
+    environment:
+      - module=smpp
+      - TZ=Asia/Kolkata
+  router1:
+    image: "winnovature/unitia:production"
+    volumes:
+      - /logs:/logs
+      - /etc/hosts:/etc/hosts
+      - /home/unitia/:/unitia
+    depends_on:
+      - "redisqueue1"
+    environment:
+      - module=router
+      - redis=redisqueue1 
+      - TZ=Asia/Kolkata
+  redisqueue1:
+    image: "redis:6.0-alpine3.12"
+    ports:
+      - "2001:6379" 
+    volumes:
+      - /home/unitia/production/redisqueue1/data/:/data
